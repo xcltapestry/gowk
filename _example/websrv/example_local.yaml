@@ -1,0 +1,20 @@
+Version: "0.0.1"
+Env: dev #dev/test/pre/prod
+App:
+  Id: 001
+  Namespace: xxxx
+Service: 
+  WebApp:
+    Name: ordersvc
+    Port: :8001
+  Redis:
+    Network: 127.0.0.1
+    Addr: :6379
+    PoolSize: 20
+  MySQL:
+    Host: 127.0.0.1
+    Port: :3306
+    DbName: testdb
+    User: demo
+    PassWord: demo 
+    PoolSize: 20
