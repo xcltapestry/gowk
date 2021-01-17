@@ -23,9 +23,11 @@ package apps
  */
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/xcltapestry/gowk/pkg/config"
 )
@@ -36,6 +38,8 @@ type Application struct {
 
 	Config *config.Config
 	Meta   *Metadata
+
+	stopTimeout, DeregisterTimeout time.Duration
 }
 
 func (app *Application) Serve(s ...Server) error {
@@ -58,17 +62,34 @@ func (app *Application) Run() error {
 
 	// app.buildConfig()
 
+	quit := make(chan os.Signal)
+	defer close(quit)
+
 	app.startupOnce.Do(func() {
 		var err error
 		for _, s := range app.servers {
 			svc := s
-			//Todo, 并行运行和统一信号量关闭
-			err = svc.Run()
-			if err != nil {
-				os.Exit(1)
-			}
+			go func() {
+				err = svc.Run()
+				if err != nil {
+					os.Exit(1)
+				}
+			}()
 		}
 	})
+
+	app.signalsListen(quit)
+
+	for _, svc := range app.servers {
+		func() {
+			ctx, cancel := context.WithTimeout(context.Background(), app.stopTimeout)
+			defer cancel()
+			svc.Stop(ctx)
+		}()
+
+	}
+
+	// app.stop()
 
 	return nil
 }
@@ -123,6 +144,7 @@ func NewApp(options ...func(*Application)) *Application {
 	app := &Application{}
 	app.Config = config.New()
 	app.Meta = NewMetadata()
+	app.stopTimeout, app.DeregisterTimeout = time.Second*5, time.Second*20
 
 	for _, f := range options {
 		f(app)

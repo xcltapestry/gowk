@@ -1,5 +1,7 @@
 package apps
 
+import "context"
+
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
  *
@@ -24,6 +26,7 @@ package apps
 
 type Server interface {
 	Run() error
+	Stop(context.Context)
 }
 
 type BaseService struct {

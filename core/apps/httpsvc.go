@@ -28,7 +28,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/context"
+	"context"
+
+	muxCtx "github.com/gorilla/context"
 	"github.com/gorilla/mux"
 )
 
@@ -47,7 +49,7 @@ type HTTPService struct {
 	ReadTimeout    time.Duration
 	MaxHeaderBytes int
 
-	HTTPTLS
+	HTTPSsl
 }
 
 func NewHTTPService() *HTTPService {
@@ -103,7 +105,7 @@ func (s *HTTPService) init() error {
 	s.svc = &http.Server{
 		TLSConfig:      s.TLSConfig,
 		Addr:           s.Addr,
-		Handler:        context.ClearHandler(http.DefaultServeMux),
+		Handler:        muxCtx.ClearHandler(http.DefaultServeMux),
 		ReadTimeout:    s.ReadTimeout,
 		WriteTimeout:   s.WriteTimeout,
 		MaxHeaderBytes: s.MaxHeaderBytes,
@@ -136,4 +138,8 @@ func (s *HTTPService) Run() error {
 	}
 
 	return nil
+}
+
+func (s *HTTPService) Stop(ctx context.Context) {
+	fmt.Println(" Serve stop. addr:", s.Addr)
 }

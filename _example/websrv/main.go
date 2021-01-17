@@ -52,17 +52,30 @@ func main() {
 		apps.InitConfig(path, fileName))
 	logger.WithName(app.Config.GetString("Service.WebApp.Name"))
 
-	httpsvc := apps.NewHTTPService()
-	httpsvc.Router(RegisterHandlers)
-	httpPort := app.Config.GetString("Service.WebApp.Port")
-	httpsvc.SetHTTPAddr(httpPort)
+	// httpsvc := apps.NewHTTPService()
+	// httpsvc.Router(RegisterHandlers)
+	// httpPort := app.Config.GetString("Service.WebApp.Port")
+	// httpsvc.SetHTTPAddr(httpPort)
+	// logger.Info("httpsvc ok httpPort:", httpPort)
 
-	logger.Info("httpsvc ok httpPort:", httpPort)
-	app.Serve(httpsvc)
+	// app.Serve(httpSvc())
+
+	httpsvc2 := apps.NewHTTPService()
+	httpsvc2.Router(RegisterHandlers2)
+	httpsvc2.SetHTTPAddr(":8003")
+	app.Serve(httpsvc2)
 
 	app.Run()
 	logger.Info("end.")
 
+}
+
+func httpSvc() *apps.HTTPService {
+	httpsvc := apps.NewHTTPService()
+	httpsvc.Router(RegisterHandlers)
+	// httpPort := app.Config.GetString("Service.WebApp.Port")
+	// httpsvc.SetHTTPAddr(httpPort)
+	return httpsvc
 }
 
 //RegisterHandlers 路由
@@ -80,6 +93,13 @@ func ArticlesCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Health: %v\n", time.Now().Unix())
+}
+
+//RegisterHandlers 路由
+func RegisterHandlers2(m *mux.Router) {
+	m.HandleFunc("/v1/ping", ArticlesCategoryHandler)
+	m.HandleFunc("/v1/health", HealthHandler)
+	m.Handle("/", http.NotFoundHandler())
 }
 
 // //ServiceConfig 服务本身的一些业务相关配置
