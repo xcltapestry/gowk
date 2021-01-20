@@ -1,6 +1,4 @@
-package apps
-
-import "context"
+package confd
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -24,11 +22,8 @@ import "context"
  * @version 1.0
  */
 
-type Server interface {
-	Run() error
-	Stop(context.Context)
-}
-
-// type BaseService struct {
-// 	Name string
-// }
+const (
+	CONFIG_env                = "env"
+	CONFIG_namespace          = "namespace"
+	CONFIG_service_redis_port = "service.redis.port"
+)

@@ -153,13 +153,6 @@ func NewApp(options ...func(*Application)) *Application {
 	return app
 }
 
-func InitConfig(path, fileName string) ApplicationOption {
-	return func(a *Application) {
-		a.Config.ReadInConfig(path, fileName)
-		a.buildConfig()
-	}
-}
-
 func Register(c string) ApplicationOption {
 	return func(a *Application) {
 		fmt.Println("[Register] c:", c)

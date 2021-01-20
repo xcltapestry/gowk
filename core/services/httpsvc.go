@@ -1,4 +1,4 @@
-package apps
+package services
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -35,6 +35,10 @@ import (
 )
 
 type RouterFunc func(m *mux.Router)
+
+type BaseService struct {
+	Name string
+}
 
 //
 type HTTPService struct {

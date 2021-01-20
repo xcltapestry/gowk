@@ -1,0 +1,11 @@
+ApiVersion: 0.0.1
+Env: dev
+Namespace: xxx.cluster
+Service:
+  Name: ordersvc
+  Redis:
+    Addr: 127.0.0.1
+    Port: :6377
+  
+
+    

@@ -23,17 +23,27 @@ package main
  */
 
 import (
+	// "bytes"
+	// "context"
 	"flag"
 	"fmt"
+	// "io/ioutil"
 	"net/http"
-	"os"
+	 "os"
+	// "path/filepath"
 	"time"
 
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
+	// "github.com/spf13/viper"
 	"github.com/xcltapestry/gowk/core/apps"
+	"github.com/xcltapestry/gowk/core/services"
 	"github.com/xcltapestry/gowk/pkg/logger"
+	// "go.etcd.io/etcd/clientv3"
+
+	// _ "github.com/spf13/viper/remote"
 )
+
 
 func main() {
 
@@ -60,23 +70,32 @@ func main() {
 
 	// app.Serve(httpSvc())
 
-	httpsvc2 := apps.NewHTTPService()
+	// httpsvc2 := apps.NewHTTPService()
+	// httpsvc2.Router(RegisterHandlers2)
+	// httpsvc2.SetHTTPAddr(":8003")
+	// app.Serve(httpsvc2)
+
+	//curl http://127.0.0.1:8003/v1/ping
+	httpsvc2 := services.NewHTTPService()
 	httpsvc2.Router(RegisterHandlers2)
 	httpsvc2.SetHTTPAddr(":8003")
 	app.Serve(httpsvc2)
 
-	app.Run()
+	// app.Run()
 	logger.Info("end.")
 
+
+
+
 }
 
-func httpSvc() *apps.HTTPService {
-	httpsvc := apps.NewHTTPService()
-	httpsvc.Router(RegisterHandlers)
-	// httpPort := app.Config.GetString("Service.WebApp.Port")
-	// httpsvc.SetHTTPAddr(httpPort)
-	return httpsvc
-}
+// func httpSvc() *apps.HTTPService {
+// 	httpsvc := apps.NewHTTPService()
+// 	httpsvc.Router(RegisterHandlers)
+// 	// httpPort := app.Config.GetString("Service.WebApp.Port")
+// 	// httpsvc.SetHTTPAddr(httpPort)
+// 	return httpsvc
+// }
 
 //RegisterHandlers 路由
 func RegisterHandlers(m *mux.Router) {
@@ -101,13 +120,3 @@ func RegisterHandlers2(m *mux.Router) {
 	m.HandleFunc("/v1/health", HealthHandler)
 	m.Handle("/", http.NotFoundHandler())
 }
-
-// //ServiceConfig 服务本身的一些业务相关配置
-// type ServiceConfig struct {
-// 	Addr string
-// }
-
-// func (cfg *ServiceConfig) ReadConfig() error {
-
-// 	return nil
-// }

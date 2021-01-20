@@ -24,6 +24,7 @@ package config
 
 import (
 	"io"
+	"sync"
 	"time"
 
 	"github.com/spf13/viper"
@@ -34,8 +35,10 @@ const _defaultConfigType = "yaml"
 //Config -
 type Config struct {
 	viper *viper.Viper
+	rwm   sync.RWMutex
 }
 
+//crypt:cli: https://bketelsen.github.io/crypt/
 func New() *Config {
 	cfg := &Config{}
 	if cfg.viper == nil {
@@ -67,6 +70,7 @@ func (cfg *Config) SetConfigType(configType string) {
 }
 
 func (cfg *Config) ReadInConfig(path, name string) error {
+
 	if cfg.viper == nil {
 		cfg.viper = viper.New()
 		cfg.viper.SetConfigType(_defaultConfigType)
@@ -80,6 +84,9 @@ func (cfg *Config) ReadInConfig(path, name string) error {
 	// 	return err
 	// }
 
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
+
 	return cfg.viper.ReadInConfig()
 }
 
@@ -88,6 +95,8 @@ func (cfg *Config) ReadConfig(in io.Reader) error {
 		cfg.viper = viper.New()
 		cfg.viper.SetConfigType(_defaultConfigType)
 	}
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.ReadConfig(in)
 }
 
@@ -95,6 +104,8 @@ func (cfg *Config) Get(key string) interface{} {
 	if cfg.viper == nil {
 		return nil
 	}
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.Get(key)
 }
 
@@ -102,41 +113,67 @@ func (cfg *Config) GetString(key string) string {
 	if cfg.viper == nil {
 		return ""
 	}
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetString(key)
 }
 
 func (cfg *Config) GetBool(key string) bool {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetBool(key)
 }
 
 func (cfg *Config) GetDuration(key string) time.Duration {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetDuration(key)
 }
 
 func (cfg *Config) GetInt(key string) int {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetInt(key)
 }
 
 func (cfg *Config) GetStringMap(key string) map[string]interface{} {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetStringMap(key)
 }
 
 func (cfg *Config) GetStringMapString(key string) map[string]string {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetStringMapString(key)
 }
 
 func (cfg *Config) GetStringMapStringSlice(key string) map[string][]string {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetStringMapStringSlice(key)
 }
 
 func (cfg *Config) GetStringSlice(key string) []string {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.GetStringSlice(key)
 }
 
 func (cfg *Config) InConfig(key string) bool {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.InConfig(key)
 }
 
 func (cfg *Config) IsSet(key string) bool {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
 	return cfg.viper.IsSet(key)
+}
+
+func (cfg *Config) AllKeys() []string {
+	cfg.rwm.Lock()
+	defer cfg.rwm.Unlock()
+	return cfg.viper.AllKeys()
 }
