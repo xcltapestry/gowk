@@ -15,29 +15,26 @@ package confd
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @Project gowk
- * @Description go framework
- * @author XiongChuanLiang<br/>(xcl_168@aliyun.com)
- * @license http://www.apache.org/licenses/  Apache v2 License
- * @version 1.0
  */
-
+ 
 import (
 	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
-	"sync"
 	"time"
 
 	"github.com/spf13/viper"
+	//"go.etcd.io/etcd/v3"
 	"go.etcd.io/etcd/clientv3"
+	// "go.etcd.io/etcd/clientv3"
 	"github.com/xcltapestry/gowk/pkg/etcd"
+	"github.com/xcltapestry/gowk/pkg/utils"
 )
 
+// EtcdConfiger
 type CfdEtcd struct {
 	currentAppConfig *AppConfig
-	watchOnce        sync.Once
 }
 
 func NewCfdEtcd(appConfig *AppConfig) *CfdEtcd {
@@ -68,7 +65,9 @@ func (ce *CfdEtcd) LoadConfigFromRemote(loadViper *viper.Viper, rootKey, configT
 	}
 	defer cli.Close()
 
-	gresp, err := cli.Client().Get(context.Background(), rootKey, clientv3.WithPrefix())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+	gresp, err := cli.Client().Get(ctx, rootKey, clientv3.WithPrefix())
 	if err != nil {
 		return err
 	}
@@ -87,6 +86,10 @@ func (ce *CfdEtcd) LoadConfigFromRemote(loadViper *viper.Viper, rootKey, configT
 //WatchRemoteConfig 监控ETCD,保存配置热更新,不建议在产线使用。产线配置变更建议通过重新发布蓝绿部署等方式，避免产线事故发生
 func (ce *CfdEtcd) WatchRemoteConfig(loadViper *viper.Viper, rootKey, configType string) error {
 
+	if loadViper == nil {
+		return fmt.Errorf(" viper is null.")
+	}
+
 	cli := ce.newEtcdCli(ce.currentAppConfig)
 	err := cli.Connect()
 	if err != nil {
@@ -94,37 +97,49 @@ func (ce *CfdEtcd) WatchRemoteConfig(loadViper *viper.Viper, rootKey, configType
 	}
 	defer cli.Close()
 
-	ce.watchOnce.Do(func() {
+	rch := cli.Client().Watch(context.Background(), rootKey, clientv3.WithPrefix())
+	go func() {
 		for {
-			rch := cli.Client().Watch(context.Background(), rootKey, clientv3.WithPrefix())
+
 			for wresp := range rch {
+				if err := wresp.Err(); err != nil {
+					fmt.Println("获得的Key变更信息有异常. ", err)
+					break
+				}
+
 				for _, ev := range wresp.Events {
+					if ev.Kv == nil {
+						continue
+					}
 					switch ev.Type {
 					case clientv3.EventTypePut:
 						fmt.Printf("[Watch]:EventTypePut: [%s] %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 
 						err2 := ce.LoadConfigFromRemote(loadViper, rootKey, configType)
 						if err2 != nil {
-							fmt.Println("[ERROR] 同步失败!")
+							fmt.Println("[ERROR] 同步失败! err:", err)
 							continue
 						}
 
 					case clientv3.EventTypeDelete:
 						fmt.Printf("[Watch]:EventTypeDelete: [%s] %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 
-					}
+					} // end switch ev.Type {
 
-				}
-			}
-		} //watch
-	})
+				} //end range wresp.Events {
+			} //end range rch
+			time.Sleep(1 * time.Second)
+			rch = cli.Client().Watch(context.Background(), rootKey, clientv3.WithPrefix())
+
+		} // end for{}
+	}() // end go func() {
 
 	return nil
 }
 
 func (ce *CfdEtcd) ReadConfigFileToETCD(confFile, rootKey string) error {
-	if IsNotExist(confFile) {
-		return fmt.Errorf(" 文件不存在! ")
+	if utils.IsNotExist(confFile) {
+		return fmt.Errorf(" 文件(%s)不存在! ", confFile)
 	}
 
 	cli := ce.newEtcdCli(ce.currentAppConfig)
@@ -139,10 +154,28 @@ func (ce *CfdEtcd) ReadConfigFileToETCD(confFile, rootKey string) error {
 		return fmt.Errorf("err:%s confFile:%s", err.Error(), confFile)
 	}
 
-	rootKey, value1 := rootKey, string(fileBody)
-	if _, err := cli.Client().Put(context.Background(), rootKey, value1); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+
+	if _, err := cli.Client().Put(ctx, rootKey, string(fileBody)); err != nil {
 		return fmt.Errorf("err:%s rootKey:%s", err.Error(), rootKey)
 	}
 
 	return nil
 }
+
+func (ce *CfdEtcd) SyncToEtcd(addrs,rootkey,confFile string) error  {
+
+	// etcdAddrs := strings.Split(addrs, ";")
+	// cli := etcd.NewEtcdCli(
+	// 			etcd.WithAddress(etcdAddrs), //"localhost:2379"
+	// 			etcd.WithDialTimeout(2*time.Second),
+	// 			etcd.WithRequestTimeout(1*time.Second),
+	// 			etcd.WithPrefix(rootkey))
+	// 	}
+
+	//return  cli.ReadConfigFileToETCD(confFile, rootKey)
+
+	return nil 
+}
+

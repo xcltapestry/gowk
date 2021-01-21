@@ -1,4 +1,4 @@
-package confd
+package jsonx
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -17,8 +17,30 @@ package confd
  *
  */
  
-const (
-	CONFIG_env                = "env"
-	CONFIG_namespace          = "namespace"
-	CONFIG_service_redis_port = "service.redis.port"
+import (
+	"io"
+
+	jsoniter "github.com/json-iterator/go"
 )
+
+var JSON = jsoniter.ConfigCompatibleWithStandardLibrary
+
+
+func Marshal(v interface{}) ([]byte, error) {
+	return JSON.Marshal(&v)
+}
+
+func Unmarshal(data []byte, v interface{}) error {
+	return JSON.Unmarshal(data, &v)
+}
+
+
+//MarshalJSONWithWriter go默认为转义转=、<、>、&，和其他语言（如C++开发的某支付后端）交互时，会出异常
+func MarshalJSONWithWriter(v interface{}, w io.Writer) (err error) {
+	enc := JSON.NewEncoder(w)
+	//处理 & < > = 特殊符号
+	enc.SetEscapeHTML(false)
+	err = enc.Encode(v)
+	return
+}
+

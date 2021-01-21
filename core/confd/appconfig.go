@@ -15,13 +15,8 @@ package confd
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @Project gowk
- * @Description go framework
- * @author XiongChuanLiang<br/>(xcl_168@aliyun.com)
- * @license http://www.apache.org/licenses/  Apache v2 License
- * @version 1.0
  */
-
+ 
 import (
 	"fmt"
 	"os"

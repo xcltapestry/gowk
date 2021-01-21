@@ -15,17 +15,15 @@ package etcd
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @Project gowk
- * @Description go framework
- * @author XiongChuanLiang<br/>(xcl_168@aliyun.com)
- * @license http://www.apache.org/licenses/  Apache v2 License
- * @version 1.0
  */
  
 import (
 	"time"
 
+	// "go.etcd.io/etcd/clientv3"
+	//"go.etcd.io/etcd/v3"
 	"go.etcd.io/etcd/clientv3"
+	
 )
 
 type EtcdCli struct {

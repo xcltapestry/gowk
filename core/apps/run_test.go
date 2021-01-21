@@ -1,4 +1,4 @@
-package apps
+package apps 
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -15,12 +15,31 @@ package apps
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @Project gowk
- * @Description go framework
- * @author XiongChuanLiang<br/>(xcl_168@aliyun.com)
- * @license http://www.apache.org/licenses/  Apache v2 License
- * @version 1.0
  */
+ 
+import (
+	"github.com/golang/glog"
+	"testing"
+	"fmt"
+)
 
-type ServiceDiscovery struct {
+
+func TestRun(t *testing.T) {
+
+
+
+	glog.Info("golog ------------- ")
+
+	fmt.Println(" ok ")
+
+	//apps.New().Run()
+
+
+	New().Run()
+
+
+	defer Flush()
+
+
 }
+

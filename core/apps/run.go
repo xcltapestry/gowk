@@ -1,4 +1,4 @@
-package confd
+package apps 
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -17,8 +17,29 @@ package confd
  *
  */
  
-const (
-	CONFIG_env                = "env"
-	CONFIG_namespace          = "namespace"
-	CONFIG_service_redis_port = "service.redis.port"
+import (
+	"github.com/xcltapestry/gowk/core/confd"
 )
+
+var App *Application
+
+func New() *Application {
+
+	App = NewApplication()
+	App.LoadConfig()
+	return App
+}
+
+func Run() error {
+	return App.Run()
+}
+
+func Flush() {
+	App.Flush()
+}
+
+func Confd() *confd.Confd {
+	return App.Confd
+}
+
+

@@ -15,11 +15,6 @@ package apps
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @Project gowk
- * @Description go framework
- * @author XiongChuanLiang<br/>(xcl_168@aliyun.com)
- * @license http://www.apache.org/licenses/  Apache v2 License
- * @version 1.0
  */
 
 import (
@@ -29,18 +24,32 @@ import (
 	"sync"
 	"time"
 
-	"github.com/xcltapestry/gowk/pkg/config"
+	"github.com/golang/glog"
+
+	"github.com/xcltapestry/gowk/core/confd"
+
+	_ "go.uber.org/automaxprocs" //Automatically set GOMAXPROCS to match Linux container CPU quota.
+
 )
 
 type Application struct {
 	servers                         []Server
 	initOnce, startupOnce, stopOnce sync.Once
 
-	Config *config.Config
+	// Config *config.Config
 	Meta   *Metadata
 
 	stopTimeout, DeregisterTimeout time.Duration
+
+	Confd *confd.Confd
 }
+
+func NewApplication() *Application {
+	app := &Application{}
+	app.init()
+	return app
+}
+
 
 func (app *Application) Serve(s ...Server) error {
 	if app == nil {
@@ -94,6 +103,11 @@ func (app *Application) Run() error {
 	return nil
 }
 
+func (app *Application) Flush() {
+	glog.Flush()
+}
+
+
 func (app *Application) RegisterService() {
 
 }
@@ -103,30 +117,30 @@ func (app *Application) UnregisterService() {
 }
 
 func (app *Application) buildConfig() {
-	if app.Config == nil {
-		return
-	}
-	if app.Meta == nil {
-		app.Meta = NewMetadata()
-	}
+	// if app.Config == nil {
+	// 	return
+	// }
+	// if app.Meta == nil {
+	// 	app.Meta = NewMetadata()
+	// }
 
-	if app.Config.InConfig("App.Namespace") {
-		app.Meta.Namespace = app.Config.GetString("App.Namespace")
-	} else {
-		app.Meta.Namespace = "default"
-	}
+	// if app.Config.InConfig("App.Namespace") {
+	// 	app.Meta.Namespace = app.Config.GetString("App.Namespace")
+	// } else {
+	// 	app.Meta.Namespace = "default"
+	// }
 
-	if app.Config.InConfig("App.Id") {
-		app.Meta.Id = app.Config.GetString("App.Id")
-	} else {
-		app.Meta.Id = "01"
-	}
+	// if app.Config.InConfig("App.Id") {
+	// 	app.Meta.Id = app.Config.GetString("App.Id")
+	// } else {
+	// 	app.Meta.Id = "01"
+	// }
 
-	if app.Config.InConfig("Env") {
-		app.Meta.Env = app.Config.GetString("Env")
-	} else {
-		app.Meta.Env = "dev"
-	}
+	// if app.Config.InConfig("Env") {
+	// 	app.Meta.Env = app.Config.GetString("Env")
+	// } else {
+	// 	app.Meta.Env = "dev"
+	// }
 
 }
 
@@ -142,8 +156,9 @@ type ApplicationOption func(*Application)
 
 func NewApp(options ...func(*Application)) *Application {
 	app := &Application{}
-	app.Config = config.New()
-	app.Meta = NewMetadata()
+	app.init()
+	// app.Config = config.New()
+	// app.Meta = NewMetadata()
 	app.stopTimeout, app.DeregisterTimeout = time.Second*5, time.Second*20
 
 	for _, f := range options {
