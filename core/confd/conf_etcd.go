@@ -25,11 +25,9 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	//"go.etcd.io/etcd/v3"
-	"go.etcd.io/etcd/clientv3"
-	// "go.etcd.io/etcd/clientv3"
 	"github.com/xcltapestry/gowk/pkg/etcd"
 	"github.com/xcltapestry/gowk/pkg/utils"
+	"go.etcd.io/etcd/clientv3"
 )
 
 // EtcdConfd
@@ -164,7 +162,7 @@ func (ce *EtcdConfd) ReadConfigFileToETCD(confFile, rootKey string) error {
 	return nil
 }
 
-func (ce *EtcdConfd) SyncToEtcd(addrs,rootkey,confFile string) error  {
+func (ce *EtcdConfd) SyncToEtcd(addrs, rootkey, confFile string) error {
 
 	// etcdAddrs := strings.Split(addrs, ";")
 	// cli := etcd.NewEtcdCli(
@@ -176,6 +174,5 @@ func (ce *EtcdConfd) SyncToEtcd(addrs,rootkey,confFile string) error  {
 
 	//return  cli.ReadConfigFileToETCD(confFile, rootKey)
 
-	return nil 
+	return nil
 }
-

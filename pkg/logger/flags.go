@@ -29,8 +29,8 @@ import (
 )
 
 const (
-	_default_logfile_maxAge     = 28  //28天
-	_default_logfile_maxSize    = 500 //500m
+	_default_logfile_maxAge     = 28  //28 days
+	_default_logfile_maxSize    = 500 //500 megabytes
 	_default_logfile_maxBackups = 3
 	_default_logfile_name       = "app.log"
 )

@@ -25,8 +25,15 @@ Service framework
 | :---- | :---- | :---- | 
 | redis | github.com/go-redis | |
 | redis | github.com/bsm/redislock |  |
-| log |  github.com/golang/glog |  |
-| log |  github.com/kubernetes/klog | 参考 |
-| log |  github.com/go-logr/logr | 参考 |
-| log | github.com/golang/glog |   |
+| log | go.uber.org/zap |  |
+| log | github.com/natefinch/lumberjack |  |
+| confd | go.etcd.io/etcd/clientv3 |  |
+| confd | github.com/spf13/viper |   |
+| router | github.com/gorilla/mux |   |
+| json | github.com/json-iterator/go |   |
+
+
+
+
+
 

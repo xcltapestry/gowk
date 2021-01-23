@@ -16,14 +16,11 @@ package etcd
  * limitations under the License.
  *
  */
- 
+
 import (
 	"time"
 
-	// "go.etcd.io/etcd/clientv3"
-	//"go.etcd.io/etcd/v3"
 	"go.etcd.io/etcd/clientv3"
-	
 )
 
 type EtcdCli struct {

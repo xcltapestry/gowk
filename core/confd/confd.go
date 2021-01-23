@@ -46,9 +46,6 @@ func NewConfd(appConfig *AppConfig) *Confd {
 	return c
 }
 
-
-
-
 func (cfd *Confd) BindConfig() error {
 
 	if cfd.remoteConfd == nil || cfd.appConfig == nil || cfd.viper == nil {
@@ -193,8 +190,6 @@ func (cfd *Confd) ReadConfigFileToRemote() error {
 	return cfd.remoteConfd.ReadConfigFileToETCD(cfd.appConfig.GetLocalConfigFile(), cfd.appConfig.GetRootKey())
 }
 
-
 func (cfd *Confd) String() string {
 	return cfd.appConfig.String()
 }
-
