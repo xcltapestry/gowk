@@ -18,74 +18,55 @@ package logger
  */
 
 /*
-ToDo:
-  - 日志不落盘支持
+
+日志级别:  debug < info < warn < error < fatal < panic
+
+  Debug: 一般程序中的调试信息
+  Info: 关键，核心流程的日志
+  Warn: 警告信息
+  Error: 错误日志
+  Fatal: 致命错误，可能会造成程序无法运转
+  Panic: 记录日志，然后panic
+
+示例:
+
+ go run main.go  -logger.outputfile="x.log" -logger.output=alsologtostdout
+
+ go run main.go  -logger.output=stdout
+
+ go run main.go  -logger.output=alsologtostdout  -logger.Level=error -logger.outputfile=err.log
+
+
 */
 
-type severity int32
+import (
+	"sync"
 
-const (
-	infoLog severity = iota
-	warningLog
-	errorLog
-	fatalLog
-	numSeverity = 4
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-var gLogger *glogx
+var logx *Logx
 
 func init() {
-	gLogger = &glogx{}
+	logx = &Logx{}
 }
 
-//WithName -
-func WithName(name string) {
-	gLogger.WithName(name)
+type Logx struct {
+	flagsOnce      sync.Once    // flags
+	formatter      LogFormatter // 日志展示格式
+	lvl            zapcore.Level
+	zapSugarLogger *zap.SugaredLogger
 }
 
-//WithValues -
-func WithValues(kvs ...interface{}) {
-	gLogger.WithValues(kvs...)
+func NewLogger(formatter LogFormatter) {
+	logx.flagsOnce.Do(parseFlags)
+	logx.setFormatter(formatter)
+	logx.initZap()
 }
 
-//Info 级别日志
-func Info(msg string, kvs ...interface{}) {
-	if len(gLogger.keyValues) > 0 {
-		for k, v := range gLogger.keyValues {
-			kvs = append(kvs, k, v)
-		}
-	}
-	gLogger.printS(infoLog, nil, msg, kvs...)
-}
-
-//Error 级别日志
-func Error(err error, msg string, kvs ...interface{}) {
-	if len(gLogger.keyValues) > 0 {
-		for k, v := range gLogger.keyValues {
-			kvs = append(kvs, k, v)
-		}
-	}
-	kvs = append(kvs, "error", err)
-	gLogger.printS(errorLog, err, msg, kvs...)
-}
-
-//Warn 级别日志
-func Warn(msg string, kvs ...interface{}) {
-	if len(gLogger.keyValues) > 0 {
-		for k, v := range gLogger.keyValues {
-			kvs = append(kvs, k, v)
-		}
-	}
-	gLogger.printS(infoLog, nil, msg, kvs...)
-}
-
-//Fatal 级别日志
-func Fatal(err error, msg string, kvs ...interface{}) {
-	if len(gLogger.keyValues) > 0 {
-		for k, v := range gLogger.keyValues {
-			kvs = append(kvs, k, v)
-		}
-	}
-	kvs = append(kvs, "error", err)
-	gLogger.printS(fatalLog, err, msg, kvs...)
+func NewDefaultLogger() {
+	logx.flagsOnce.Do(parseFlags)
+	logx.setFormatter(JSON)
+	logx.initZap()
 }

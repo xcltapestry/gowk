@@ -26,10 +26,12 @@ require (
 	go.etcd.io/bbolt v1.3.3 // indirect
 	go.etcd.io/etcd v3.3.22+incompatible
 	go.uber.org/automaxprocs v1.3.0
+	go.uber.org/zap v1.10.0
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
 	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456 // indirect
 	google.golang.org/grpc v1.26.0 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.25 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	sigs.k8s.io/yaml v1.1.0 // indirect
 )
 

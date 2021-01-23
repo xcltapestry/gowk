@@ -17,31 +17,52 @@ package logger
  *
  */
 
-import (
-	"errors"
-	"flag"
-	"testing"
+import "testing"
 
-	"github.com/golang/glog"
-)
+func TestText(t *testing.T) {
 
-//  go test -v -cover=true
+	NewLogger(Text)
 
-func TestLogger(t *testing.T) {
+	Debug("debug msg")
+	Info("info msg")
+	Warn("warn msg")
+	Infow("this is a dummy log1111", "request_id", "I100")
+	Infow("this is a dummy log222", "request_id", "I101")
+	Errorw("this is a Errorw log", "request_id", "E102")
 
-	flag.Set("logtostderr", "true")
-	flag.Parse()
-	defer glog.Flush()
+}
 
-	WithName("notifysrv")
-	WithValues("cloud", "aws-sg", "name", "notifysrv.xcl-servicestat:8080", "instanceIP", "172.168.1.1")
+func TestJSON(t *testing.T) {
+	NewLogger(JSON)
+	Debug("debug msg")
+	Info("info msg")
+	Warn("warn msg")
+	Infow("infow msg", "request_id", "i001")
+	Infow("infow msg", "request_id", "i002")
+	Errorw("error msg", "request_id", "e003")
+	// Fatal("fatal msg")
+	// Panic("panic msg")
+}
 
-	Error(errors.New("Request failed with status code 503"), "handlecreate()", "requestId", 1, "parm", map[string]int{"k": 1})
-	Info("name resolution failed", "val1", 1, "val2", map[string]int{"k": 1})
+func TestFatal(t *testing.T) {
+	NewDefaultLogger()
+	Debug("debug msg")
+	Info("info msg")
+	Warn("warn msg")
+	Fatal("fatal msg")
+	Infow("infow msg", "request_id", "i001")
+	Infow("infow msg", "request_id", "i002")
+	Errorw("error msg", "request_id", "e003")
+	Panic("panic msg")
+}
 
-	/*
-		output:
-			notifysrv "handlecreate()" err="Request failed with status code 503" requestId=1 parm=map[k:1] cloud="aws-sg" name="notifysrv.xcl-servicestat:8080" instanceIP="172.168.1.1" error="Request failed with status code 503"
-			notifysrv "name resolution failed" val1=1 val2=map[k:1] instanceIP="172.168.1.1" cloud="aws-sg" name="notifysrv.xcl-servicestat:8080"
-	*/
+func TestPanic(t *testing.T) {
+	NewDefaultLogger()
+	Debug("debug msg")
+	Infof("info msg err:%s", "notfound!")
+	Warn("warn msg")
+	Panic("panic msg") //会退出应用
+	Infow("infow msg", "request_id", "i001")
+	Infow("infow msg", "request_id", "i002")
+	Errorw("error msg", "request_id", "e003")
 }
