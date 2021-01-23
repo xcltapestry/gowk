@@ -16,7 +16,7 @@ package confd
  * limitations under the License.
  *
  */
- 
+
 import (
 	"fmt"
 	"os"
@@ -126,8 +126,8 @@ func (c *AppConfig) verify() error {
 	return nil
 }
 
-//UpdateConfig 从命令行参数与环境变量中获取参数
-func (c *AppConfig) UpdateConfig(deployEnv, namespace, appName, appVersion string,
+//GetAppFlags 从命令行参数与环境变量中获取参数
+func (c *AppConfig) GetAppFlags(deployEnv, namespace, appName, appVersion string,
 	confdLocalFile, confdRemoteAddrs, confdRemoteConfigType string, confdSyncMode bool,
 	logsvcNats string) error {
 
@@ -185,38 +185,41 @@ func (c *AppConfig) GetLocalConfigFile() string {
 
 func (c *AppConfig) GetConfdRemoteAddrs() []string {
 	//strings.Split("localhost:2379;localhost:2377;localhost:2376", ";")
+	if strings.TrimSpace(c.confdRemoteAddrs) == "" {
+		return []string{}
+	}
 	return strings.Split(c.confdRemoteAddrs, ";")
 }
 
 func (c *AppConfig) String() string {
 	var builder strings.Builder
-	builder.WriteString(" cloud=")
+	builder.WriteString(" \ncloud=")
 	builder.WriteString(c.cloud)
-	builder.WriteString(" region=")
+	builder.WriteString(" \nregion=")
 	builder.WriteString(c.region)
-	builder.WriteString(" codeBuiildSourceVersion=")
+	builder.WriteString(" \ncodeBuiildSourceVersion=")
 	builder.WriteString(c.codeBuiildSourceVersion)
-	builder.WriteString(" codeBuildTime=")
+	builder.WriteString(" \ncodeBuildTime=")
 	builder.WriteString(c.codeBuildTime)
-	builder.WriteString(" gitHash=")
+	builder.WriteString(" \ngitHash=")
 	builder.WriteString(c.gitHash)
-	builder.WriteString(" deployEnv=")
+	builder.WriteString(" \ndeployEnv=")
 	builder.WriteString(c.deployEnv)
-	builder.WriteString(" namespace=")
+	builder.WriteString(" \nnamespace=")
 	builder.WriteString(c.namespace)
-	builder.WriteString(" appName=")
+	builder.WriteString(" \nappName=")
 	builder.WriteString(c.appName)
-	builder.WriteString(" appVersion=")
+	builder.WriteString(" \nappVersion=")
 	builder.WriteString(c.appVersion)
-	builder.WriteString(" logsvcNats=")
+	builder.WriteString(" \nlogsvcNats=")
 	builder.WriteString(c.logsvcNats)
-	builder.WriteString(" localConfigFile=")
+	builder.WriteString(" \nlocalConfigFile=")
 	builder.WriteString(c.localConfigFile)
-	builder.WriteString(" confdRemoteAddrs=")
+	builder.WriteString(" \nconfdRemoteAddrs=")
 	builder.WriteString(c.confdRemoteAddrs)
-	builder.WriteString(" confdRemoteConfigType=")
+	builder.WriteString(" \nconfdRemoteConfigType=")
 	builder.WriteString(c.confdRemoteConfigType)
-	builder.WriteString(" rootKey=")
+	builder.WriteString(" \nrootKey=")
 	builder.WriteString(c.rootKey)
 	return builder.String()
 }

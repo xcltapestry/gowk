@@ -16,9 +16,9 @@ package confd
  * limitations under the License.
  *
  */
- 
+
 const (
-	CONFIG_env                = "env"
-	CONFIG_namespace          = "namespace"
-	CONFIG_service_redis_port = "service.redis.port"
+	CONF_KEY_env                = "env"
+	CONF_KEY_namespace          = "namespace"
+	CONF_KEY_service_redis_port = "service.redis.port"
 )

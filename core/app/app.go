@@ -1,4 +1,4 @@
-package apps
+package app
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -20,6 +20,7 @@ package apps
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -29,7 +30,6 @@ import (
 	"github.com/xcltapestry/gowk/core/confd"
 
 	_ "go.uber.org/automaxprocs" //Automatically set GOMAXPROCS to match Linux container CPU quota.
-
 )
 
 type Application struct {
@@ -37,19 +37,29 @@ type Application struct {
 	initOnce, startupOnce, stopOnce sync.Once
 
 	// Config *config.Config
-	Meta   *Metadata
+	// Meta *Metadata
 
 	stopTimeout, DeregisterTimeout time.Duration
 
-	Confd *confd.Confd
+	confdx *confd.Confd
 }
 
 func NewApplication() *Application {
 	app := &Application{}
-	app.init()
+	err := app.init()
+	if err != nil {
+		fmt.Println("[NewApplication] err:", err)
+		log.Fatal(" err:", err)
+	} else {
+		fmt.Println("[NewApplication] app.init()")
+	}
 	return app
 }
 
+//Confd 配置中心
+func (app *Application) Confd() *confd.Confd {
+	return app.confdx
+}
 
 func (app *Application) Serve(s ...Server) error {
 	if app == nil {
@@ -68,8 +78,6 @@ func (app *Application) Run() error {
 	if len(app.servers) <= 0 {
 		os.Exit(0)
 	}
-
-	// app.buildConfig()
 
 	quit := make(chan os.Signal)
 	defer close(quit)
@@ -107,7 +115,6 @@ func (app *Application) Flush() {
 	glog.Flush()
 }
 
-
 func (app *Application) RegisterService() {
 
 }
@@ -116,40 +123,40 @@ func (app *Application) UnregisterService() {
 
 }
 
-func (app *Application) buildConfig() {
-	// if app.Config == nil {
-	// 	return
-	// }
-	// if app.Meta == nil {
-	// 	app.Meta = NewMetadata()
-	// }
+// func (app *Application) buildConfig() {
+// if app.Config == nil {
+// 	return
+// }
+// if app.Meta == nil {
+// 	app.Meta = NewMetadata()
+// }
 
-	// if app.Config.InConfig("App.Namespace") {
-	// 	app.Meta.Namespace = app.Config.GetString("App.Namespace")
-	// } else {
-	// 	app.Meta.Namespace = "default"
-	// }
+// if app.Config.InConfig("App.Namespace") {
+// 	app.Meta.Namespace = app.Config.GetString("App.Namespace")
+// } else {
+// 	app.Meta.Namespace = "default"
+// }
 
-	// if app.Config.InConfig("App.Id") {
-	// 	app.Meta.Id = app.Config.GetString("App.Id")
-	// } else {
-	// 	app.Meta.Id = "01"
-	// }
+// if app.Config.InConfig("App.Id") {
+// 	app.Meta.Id = app.Config.GetString("App.Id")
+// } else {
+// 	app.Meta.Id = "01"
+// }
 
-	// if app.Config.InConfig("Env") {
-	// 	app.Meta.Env = app.Config.GetString("Env")
-	// } else {
-	// 	app.Meta.Env = "dev"
-	// }
+// if app.Config.InConfig("Env") {
+// 	app.Meta.Env = app.Config.GetString("Env")
+// } else {
+// 	app.Meta.Env = "dev"
+// }
 
-}
+// }
 
-func (app *Application) GetMetadata() *Metadata {
-	if app.Meta == nil {
-		app.Meta = NewMetadata()
-	}
-	return app.Meta
-}
+// func (app *Application) GetMetadata() *Metadata {
+// 	if app.Meta == nil {
+// 		app.Meta = NewMetadata()
+// 	}
+// 	return app.Meta
+// }
 
 //
 type ApplicationOption func(*Application)

@@ -16,7 +16,7 @@ package confd
  * limitations under the License.
  *
  */
- 
+
 import (
 	"bytes"
 	"context"
@@ -32,18 +32,18 @@ import (
 	"github.com/xcltapestry/gowk/pkg/utils"
 )
 
-// EtcdConfiger
-type CfdEtcd struct {
+// EtcdConfd
+type EtcdConfd struct {
 	currentAppConfig *AppConfig
 }
 
-func NewCfdEtcd(appConfig *AppConfig) *CfdEtcd {
-	ce := &CfdEtcd{}
+func NewEtcdConfd(appConfig *AppConfig) *EtcdConfd {
+	ce := &EtcdConfd{}
 	ce.currentAppConfig = appConfig
 	return ce
 }
 
-func (ce *CfdEtcd) newEtcdCli(appConfig *AppConfig) *etcd.EtcdCli {
+func (ce *EtcdConfd) newEtcdCli(appConfig *AppConfig) *etcd.EtcdCli {
 	return etcd.NewEtcdCli(
 		etcd.WithAddress(appConfig.GetConfdRemoteAddrs()), //"localhost:2379"
 		etcd.WithDialTimeout(2*time.Second),
@@ -52,7 +52,7 @@ func (ce *CfdEtcd) newEtcdCli(appConfig *AppConfig) *etcd.EtcdCli {
 }
 
 //loadConfigFromRemote 依server的rootkey，取出对应的配置文件，并解析更新当前配置
-func (ce *CfdEtcd) LoadConfigFromRemote(loadViper *viper.Viper, rootKey, configType string) error {
+func (ce *EtcdConfd) LoadConfigFromRemote(loadViper *viper.Viper, rootKey, configType string) error {
 
 	if loadViper == nil {
 		return fmt.Errorf(" viper is null.")
@@ -84,7 +84,7 @@ func (ce *CfdEtcd) LoadConfigFromRemote(loadViper *viper.Viper, rootKey, configT
 }
 
 //WatchRemoteConfig 监控ETCD,保存配置热更新,不建议在产线使用。产线配置变更建议通过重新发布蓝绿部署等方式，避免产线事故发生
-func (ce *CfdEtcd) WatchRemoteConfig(loadViper *viper.Viper, rootKey, configType string) error {
+func (ce *EtcdConfd) WatchRemoteConfig(loadViper *viper.Viper, rootKey, configType string) error {
 
 	if loadViper == nil {
 		return fmt.Errorf(" viper is null.")
@@ -137,7 +137,7 @@ func (ce *CfdEtcd) WatchRemoteConfig(loadViper *viper.Viper, rootKey, configType
 	return nil
 }
 
-func (ce *CfdEtcd) ReadConfigFileToETCD(confFile, rootKey string) error {
+func (ce *EtcdConfd) ReadConfigFileToETCD(confFile, rootKey string) error {
 	if utils.IsNotExist(confFile) {
 		return fmt.Errorf(" 文件(%s)不存在! ", confFile)
 	}
@@ -164,7 +164,7 @@ func (ce *CfdEtcd) ReadConfigFileToETCD(confFile, rootKey string) error {
 	return nil
 }
 
-func (ce *CfdEtcd) SyncToEtcd(addrs,rootkey,confFile string) error  {
+func (ce *EtcdConfd) SyncToEtcd(addrs,rootkey,confFile string) error  {
 
 	// etcdAddrs := strings.Split(addrs, ";")
 	// cli := etcd.NewEtcdCli(

@@ -1,4 +1,4 @@
-package apps
+package app
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -23,17 +23,20 @@ package apps
 import (
 	"flag"
 	"fmt"
+
 	"github.com/xcltapestry/gowk/core/confd"
 )
 
-
-
-func (app *Application) init() {
-	appCfg := app.parseFlags()
-	app.Confd = confd.NewConfd(appCfg)
+func (app *Application) init() error {
+	appCfg, err := app.parseFlags()
+	if err != nil {
+		return err
+	}
+	app.confdx = confd.NewConfd(appCfg)
+	return nil
 }
 
-func (app *Application) parseFlags() *confd.AppConfig {
+func (app *Application) parseFlags() (*confd.AppConfig, error) {
 
 	var (
 		deployEnv             string
@@ -49,7 +52,7 @@ func (app *Application) parseFlags() *confd.AppConfig {
 
 	flag.StringVar(&deployEnv, "deployenv", "dev", "dev/prod/pre/uat")
 	//如果confd.remote.addrs为空或不通，则查找本地yaml.如都找不到，服务启动失败，如都有配置，优化找远程配置中心
-	flag.StringVar(&confdLocalFile, "confd.local.file", "", "本地配置文件如: config.yaml")
+	flag.StringVar(&confdLocalFile, "confd.local.file", "config.yaml", "本地配置文件如: config.yaml")
 	flag.StringVar(&confdRemoteAddrs, "confd.remote.addrs", "", "远程配置中心地址，使用;分隔，如ETCD地址localhost:2379")
 	flag.StringVar(&confdRemoteConfigType, "confd.remote.configtype", "yaml", "指定配置中心还原解析时的文件类型，默认yaml")
 	flag.BoolVar(&confdSyncMode, "confd.remote.watch", false, "是否监控配置变更自动同步？默认为否.")
@@ -61,27 +64,33 @@ func (app *Application) parseFlags() *confd.AppConfig {
 	flag.Parse()
 
 	scfg := confd.NewAppConfig()
-	scfg.UpdateConfig(deployEnv, namespace, appName, version, confdLocalFile, confdRemoteAddrs, confdRemoteConfigType, confdSyncMode, logsvcNats)
-
-	return scfg
+	err := scfg.GetAppFlags(deployEnv, namespace, appName, version,
+		confdLocalFile, confdRemoteAddrs, confdRemoteConfigType, confdSyncMode, logsvcNats)
+	if err != nil {
+		return nil, err
+	}
+	return scfg, nil
 }
 
-func (app *Application) LoadConfig() {
-	err := app.Confd.BindConfig()
+func (app *Application) LoadConfig() error {
+
+	err := app.confdx.BindConfig()
+	if err != nil {
+		return err
+	}
 	fmt.Println("BindConfig  err:", err)
 
 	fmt.Println(" ------------------------------------- ")
-	keys := app.Confd.AllKeys()
+	keys := app.confdx.AllKeys()
 	for _, k := range keys {
 		fmt.Printf("AllKeys----[keys] %s\n", k)
 	}
 
-	fmt.Println("[confd] rootkey:", app.Confd.GetRootKey())
-	fmt.Println("[confd] Service.Name", app.Confd.Get("Service.Name"))
-	fmt.Println("[confd] namespace:", app.Confd.GetString("Namespace"))
+	fmt.Println("[confd] rootkey:", app.confdx.GetRootKey())
+	fmt.Println("[confd] Service.Name", app.confdx.Get("Service.Name"))
+	fmt.Println("[confd] namespace:", app.confdx.GetString("Namespace"))
 	// fmt.Println("[confd] Env:", app.Confd.GetString(confdx.CONFIG_env))
-	fmt.Println("[confd] service.redis.port:", app.Confd.GetString("service.redis.port"))
+	fmt.Println("[confd] service.redis.port:", app.confdx.GetString("service.redis.port"))
 
+	return nil
 }
-
-

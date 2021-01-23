@@ -16,7 +16,7 @@ package confd
  * limitations under the License.
  *
  */
- 
+
 import (
 	"fmt"
 	"sync"
@@ -30,7 +30,7 @@ type Confd struct {
 	syncMode bool // 是否启用同步更新热更新配置的方式？
 
 	appConfig   *AppConfig
-	remoteConfd *CfdEtcd
+	remoteConfd *EtcdConfd
 	localConfd  *ConfLocalFile
 	viper       *viper.Viper
 
@@ -40,11 +40,14 @@ type Confd struct {
 func NewConfd(appConfig *AppConfig) *Confd {
 	c := &Confd{}
 	c.appConfig = appConfig
-	c.remoteConfd = NewCfdEtcd(appConfig)
+	c.remoteConfd = NewEtcdConfd(appConfig)
 	c.localConfd = NewConfLocalFile()
 	c.viper = viper.New()
 	return c
 }
+
+
+
 
 func (cfd *Confd) BindConfig() error {
 
@@ -57,7 +60,7 @@ func (cfd *Confd) BindConfig() error {
 
 	switch {
 	case len(addrs) > 0:
-		etcdCli := NewCfdEtcd(cfd.appConfig)
+		etcdCli := NewEtcdConfd(cfd.appConfig)
 		loadViper := viper.New()
 		err := etcdCli.LoadConfigFromRemote(loadViper, cfd.appConfig.GetRootKey(), cfd.appConfig.GetRemoteConfigType())
 		if err != nil {
@@ -91,7 +94,7 @@ func (cfd *Confd) WatchRemoteConfig() error {
 	}
 	addrs := cfd.appConfig.GetConfdRemoteAddrs()
 	if len(addrs) > 0 {
-		etcdCli := NewCfdEtcd(cfd.appConfig)
+		etcdCli := NewEtcdConfd(cfd.appConfig)
 		loadViper := viper.New()
 		err := etcdCli.WatchRemoteConfig(loadViper, cfd.appConfig.GetRootKey(), cfd.appConfig.GetRemoteConfigType())
 		if err != nil {
@@ -189,3 +192,9 @@ func (cfd *Confd) AllKeys() []string {
 func (cfd *Confd) ReadConfigFileToRemote() error {
 	return cfd.remoteConfd.ReadConfigFileToETCD(cfd.appConfig.GetLocalConfigFile(), cfd.appConfig.GetRootKey())
 }
+
+
+func (cfd *Confd) String() string {
+	return cfd.appConfig.String()
+}
+

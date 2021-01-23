@@ -1,6 +1,4 @@
-package apps
-
-import "context"
+package app
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -19,11 +17,35 @@ import "context"
  *
  */
 
-type Server interface {
-	Run() error
-	Stop(context.Context)
+import (
+	"fmt"
+	"log"
+
+	"github.com/xcltapestry/gowk/core/confd"
+)
+
+var App *Application
+
+func New() *Application {
+
+	App = NewApplication()
+	err := App.LoadConfig()
+	if err != nil {
+		fmt.Println(" err:", err)
+		log.Fatal(" err:", err)
+	}
+	fmt.Println(App.Confd().String())
+	return App
 }
 
-// type BaseService struct {
-// 	Name string
-// }
+func Run() error {
+	return App.Run()
+}
+
+func Flush() {
+	App.Flush()
+}
+
+func Confd() *confd.Confd {
+	return App.Confd()
+}

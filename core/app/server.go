@@ -1,4 +1,6 @@
-package apps
+package app
+
+import "context"
 
 /**
  * Copyright 2021  gowrk Author. All Rights Reserved.
@@ -16,16 +18,8 @@ package apps
  * limitations under the License.
  *
  */
- 
-type Metadata struct {
-	Namespace  string
-	Id         string
-	Env        string
-	TimeFormat string
-}
 
-func NewMetadata() *Metadata {
-	m := &Metadata{}
-	m.TimeFormat = "2006-01-02T15:04:05.999999"
-	return m
+type Server interface {
+	Run() error
+	Stop(context.Context)
 }
