@@ -23,25 +23,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	"github.com/xcltapestry/gowk/core/services"
+	"github.com/xcltapestry/gowk/pkg/logger"
 )
 
 func TestRun(t *testing.T) {
-
-	glog.Info("golog ------------- ")
-
-	fmt.Println(" ok ")
+	logger.NewDefaultLogger()
+	logger.Info("准备启用服务")
 	New()
+
 	httpsvc2 := services.NewHTTPService()
 	httpsvc2.Router(RegisterHandlers)
 	httpsvc2.SetHTTPAddr(":8003")
 	App.Serve(httpsvc2)
-	fmt.Println("Serve --> :8003")
+
+	logger.Infow("Serve -->Listen :8003")
+
 	Run()
 
-	defer Flush()
+	logger.Infow("Serve --> end.")
+
+	// defer Flush()
 
 }
 

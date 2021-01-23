@@ -47,7 +47,7 @@ var ( //flags
 
 func parseFlags() {
 
-	flag.StringVar(&_logOutput, "logger.output", "alsologtostdout", "仅支持下列选项: file/alsologtostderr/alsologtostdout/stderr/stdout/ ")
+	flag.StringVar(&_logOutput, "logger.output", "stdout", "仅支持下列选项: file/alsologtostderr/alsologtostdout/stderr/stdout/ ")
 	flag.StringVar(&_logOutputFile, "logger.outputfile", "app.log", "输出到指定日志文件")
 
 	flag.StringVar(&_logLevel, "logger.Level", "debug", "日志级别: debug/info/warn/error/fatal")
@@ -56,7 +56,7 @@ func parseFlags() {
 	flag.IntVar(&_logMaxSize, "logger.maxsize", 500, "单个日志文件大小")
 	flag.BoolVar(&_logCompress, "logger.compress", true, "日志文件是否打开压缩")
 
-	flag.Parse()
+	// flag.Parse()  //testing时，使用
 
 }
 

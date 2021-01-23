@@ -20,38 +20,26 @@ package app
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/golang/glog"
-
 	"github.com/xcltapestry/gowk/core/confd"
-
-	_ "go.uber.org/automaxprocs" //Automatically set GOMAXPROCS to match Linux container CPU quota.
+	"github.com/xcltapestry/gowk/pkg/logger"
 )
 
 type Application struct {
 	servers                         []Server
 	initOnce, startupOnce, stopOnce sync.Once
-
-	// Config *config.Config
-	// Meta *Metadata
-
-	stopTimeout, DeregisterTimeout time.Duration
-
-	confdx *confd.Confd
+	stopTimeout, DeregisterTimeout  time.Duration
+	confdx                          *confd.Confd
 }
 
 func NewApplication() *Application {
 	app := &Application{}
 	err := app.init()
 	if err != nil {
-		fmt.Println("[NewApplication] err:", err)
-		log.Fatal(" err:", err)
-	} else {
-		fmt.Println("[NewApplication] app.init()")
+		logger.Fatalw(" 应用初始化失败。 ", " err:", err.Error())
 	}
 	return app
 }
@@ -112,7 +100,7 @@ func (app *Application) Run() error {
 }
 
 func (app *Application) Flush() {
-	glog.Flush()
+
 }
 
 func (app *Application) RegisterService() {

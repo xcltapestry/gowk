@@ -22,12 +22,12 @@ package app
 
 import (
 	"flag"
-	"fmt"
 
 	"github.com/xcltapestry/gowk/core/confd"
 )
 
 func (app *Application) init() error {
+
 	appCfg, err := app.parseFlags()
 	if err != nil {
 		return err
@@ -78,19 +78,18 @@ func (app *Application) LoadConfig() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("BindConfig  err:", err)
 
-	fmt.Println(" ------------------------------------- ")
-	keys := app.confdx.AllKeys()
-	for _, k := range keys {
-		fmt.Printf("AllKeys----[keys] %s\n", k)
-	}
+	// fmt.Println(" ------------------------------------- ")
+	// keys := app.confdx.AllKeys()
+	// for _, k := range keys {
+	// 	fmt.Printf("AllKeys----[keys] %s\n", k)
+	// }
 
-	fmt.Println("[confd] rootkey:", app.confdx.GetRootKey())
-	fmt.Println("[confd] Service.Name", app.confdx.Get("Service.Name"))
-	fmt.Println("[confd] namespace:", app.confdx.GetString("Namespace"))
-	// fmt.Println("[confd] Env:", app.Confd.GetString(confdx.CONFIG_env))
-	fmt.Println("[confd] service.redis.port:", app.confdx.GetString("service.redis.port"))
+	// fmt.Println("[confd] rootkey:", app.confdx.GetRootKey())
+	// fmt.Println("[confd] Service.Name", app.confdx.Get("Service.Name"))
+	// fmt.Println("[confd] namespace:", app.confdx.GetString("Namespace"))
+	// // fmt.Println("[confd] Env:", app.Confd.GetString(confdx.CONFIG_env))
+	// fmt.Println("[confd] service.redis.port:", app.confdx.GetString("service.redis.port"))
 
 	return nil
 }

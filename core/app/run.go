@@ -18,28 +18,42 @@ package app
  */
 
 import (
-	"fmt"
-	"log"
+	"context"
+	"runtime"
 
 	"github.com/xcltapestry/gowk/core/confd"
+	"github.com/xcltapestry/gowk/pkg/logger"
+	"go.uber.org/automaxprocs/maxprocs"
 )
 
 var App *Application
 
 func New() *Application {
 
+	//_ "go.uber.org/automaxprocs" Automatically set GOMAXPROCS to match Linux container CPU quota.
+	_, _ = maxprocs.Set(maxprocs.Logger(logger.Infof))
+	logger.Infof("runtime.NumCPU: %d runtime.GOMAXPROCS: %d  ", runtime.NumCPU(), runtime.GOMAXPROCS(-1))
+
 	App = NewApplication()
 	err := App.LoadConfig()
 	if err != nil {
-		fmt.Println(" err:", err)
-		log.Fatal(" err:", err)
+		logger.Fatalw("配置读取失败", " err:", err.Error())
 	}
-	fmt.Println(App.Confd().String())
+	logger.Infof("应用配置信息: %s", App.Confd().String())
+
 	return App
+}
+
+func Serve(s ...Server) error {
+	return App.Serve(s...)
 }
 
 func Run() error {
 	return App.Run()
+}
+
+func Stop(ctx context.Context) {
+
 }
 
 func Flush() {

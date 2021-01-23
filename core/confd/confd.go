@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/xcltapestry/gowk/pkg/logger"
 )
 
 type Confd struct {
@@ -57,18 +58,22 @@ func (cfd *Confd) BindConfig() error {
 
 	switch {
 	case len(addrs) > 0:
+		rKey := cfd.appConfig.GetRootKey()
+		logger.Infow("准备从远程ETCD配置中心读取配置. ", " key:", rKey)
 		etcdCli := NewEtcdConfd(cfd.appConfig)
 		loadViper := viper.New()
-		err := etcdCli.LoadConfigFromRemote(loadViper, cfd.appConfig.GetRootKey(), cfd.appConfig.GetRemoteConfigType())
+		err := etcdCli.LoadConfigFromRemote(loadViper, rKey, cfd.appConfig.GetRemoteConfigType())
 		if err != nil {
-			return err
+			return err // todo: 假如err是因为rootkey在远程没找到，则尝试读本地文件
 		}
 		cfd.rmu.Lock()
 		cfd.viper = loadViper
 		cfd.rmu.Unlock()
+		logger.Infow("从远程ETCD配置中心读取配置完毕. ", " key:", rKey)
 		cfd.WatchRemoteConfig()
 		return nil
 	case confFile != "": //读本地文件
+		logger.Infow("准备从本地配置文件读取配置.", "文件", confFile)
 		loadViper := viper.New()
 		err := cfd.localConfd.LoadConfigFromLocalFile(loadViper, confFile)
 		if err != nil {
@@ -77,6 +82,7 @@ func (cfd *Confd) BindConfig() error {
 		cfd.rmu.Lock()
 		cfd.viper = loadViper
 		cfd.rmu.Unlock()
+		logger.Info("从本地配置文件读取配置完毕. ", "文件", confFile)
 		return nil
 	default: //len(addrs) == 0 && confFile == ""
 		return fmt.Errorf(" 远程配置中心或本地配置文件必须指定一个。")

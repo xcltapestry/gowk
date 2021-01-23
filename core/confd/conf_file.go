@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -20,23 +20,26 @@ func NewConfLocalFile() *ConfLocalFile {
 
 //
 func (cf *ConfLocalFile) LoadConfigFromLocalFile(loadViper *viper.Viper, confFile string) error {
-	path, ext, err := PaseConfigFile(confFile)
-	if err != nil {
-		return err
-	}
-
 	if loadViper == nil {
 		return fmt.Errorf(" viper is null.")
 	}
 
-	loadViper.AddConfigPath(path)
+	path, ext, err := PaseConfigFile(confFile)
+	if err != nil {
+		return err
+	}
+	if path != "" {
+		loadViper.AddConfigPath(path)
+	}
 	path2, _ := os.Getwd()
 	loadViper.AddConfigPath(path2)
+	loadViper.AddConfigPath(".")
+	loadViper.SetConfigName(filepath.Base(confFile))
 	loadViper.SetConfigType(cf.getConfigType(ext))
 	//读取配置
 	err = loadViper.ReadInConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf(" viper 读取本地配置文件失败. err:%s", err.Error())
 	}
 
 	return nil
@@ -51,7 +54,7 @@ func (cf *ConfLocalFile) ReadConfig(loadViper *viper.Viper, in io.Reader, config
 	loadViper.SetConfigType(cf.getConfigType(configType))
 	err := loadViper.ReadConfig(in)
 	if err != nil {
-		return err
+		return fmt.Errorf(" viper 读取失败. err:%s configType:%s", err.Error(), configType)
 	}
 
 	return nil
@@ -66,7 +69,6 @@ func (cf *ConfLocalFile) getConfigType(configType string) string {
 	}
 }
 
-
 //PaseConfigFile 解析文件，得到path,ext
 func PaseConfigFile(confFile string) (string, string, error) {
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
@@ -78,7 +80,6 @@ func PaseConfigFile(confFile string) (string, string, error) {
 
 	return path, fext, nil
 }
-
 
 //包含中文的字符串截取
 func SubString(str string, begin, length int) (substr string) {
