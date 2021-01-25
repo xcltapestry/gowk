@@ -23,6 +23,8 @@ import (
 	"go.etcd.io/etcd/clientv3"
 )
 
+var _DefaultEndpoints = "localhost:2379"
+
 type EtcdCli struct {
 	config         clientv3.Config
 	prefix         string
@@ -35,7 +37,7 @@ type EtcdCliOption func(*EtcdCli)
 func NewEtcdCli(options ...func(*EtcdCli)) *EtcdCli {
 
 	cli := &EtcdCli{}
-	cli.config.Endpoints = []string{"localhost:2379"}
+	cli.config.Endpoints = []string{_DefaultEndpoints}
 	cli.config.DialTimeout = 2 * time.Second
 
 	for _, f := range options {

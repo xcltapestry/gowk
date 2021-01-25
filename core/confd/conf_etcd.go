@@ -63,6 +63,8 @@ func (ce *EtcdConfd) LoadConfigFromRemote(loadViper *viper.Viper, rootKey, confi
 	}
 	defer cli.Close()
 
+	fmt.Println("[Resolver] connect etcd!")
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	gresp, err := cli.Client().Get(ctx, rootKey, clientv3.WithPrefix())

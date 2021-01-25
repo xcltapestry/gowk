@@ -9,6 +9,8 @@ import (
 	"github.com/xcltapestry/gowk/core/app"
 	"github.com/xcltapestry/gowk/core/services"
 	"github.com/xcltapestry/gowk/pkg/logger"
+
+	"github.com/xcltapestry/gowk/core/naming2"
 )
 
 var (
@@ -28,6 +30,9 @@ test:
 
 */
 func main() {
+
+	naming2.Reg()
+
 
 	// logger.NewDefaultLogger()
 	logger.NewLogger(logger.Text)
