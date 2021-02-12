@@ -29,18 +29,3 @@ require (
 
 replace github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.4
 
-// backend.go:324:9: options.OpenFile undefined (type bbolt.Options has no field or method OpenFile)
-//replace github.com/coreos/bbolt => go.etcd.io/bbolt v3.3.20
-// replace github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.3
-
-// replace github.com/coreos/bbolt => go.etcd.io/bbolt v1.3.3
-
-// require (
-// 	github.com/coreos/etcd v2.3.8+incompatible // indirect
-// 	go.etcd.io/etcd v3.3.22+incompatible
-// )
-
-// replace google.golang.org/grpc => google.golang.org/grpc v1.26.0 // indirect
-
-// 	github.com/coreos/etcd v3.3.22+incompatible
-// v3.3.22+incompat
