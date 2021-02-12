@@ -40,10 +40,13 @@ https://etcd.io/docs/v3.1.12/op-guide/grpc_proxy/
 **/
 
 import (
+	"context"
 	"fmt"
 
 	etcdClientV3 "github.com/coreos/etcd/clientv3"
-	"github.com/coreos/etcd/proxy/grpcproxy"
+	etcdNaming "github.com/coreos/etcd/clientv3/naming"
+	"google.golang.org/grpc/naming"
+	// "github.com/coreos/etcd/proxy/grpcproxy"
 )
 
 const (
@@ -62,17 +65,14 @@ type etcdRegisty struct {
 }
 
 //GetKey 得到服务Key
-func (svc *etcdRegisty) GetKey() string {
-	return fmt.Sprint(svc.ServiceInfo.Name, "/", svc.ServiceInfo.Addr)
+func (s *etcdRegisty) GetKey() string {
+	return fmt.Sprint(s.ServiceInfo.Name, "/", s.ServiceInfo.Addr)
 }
 
 //Register 注册服务
-func (s *etcdRegisty) Register(etcdCfg etcdClientV3.Config, rpcSvc *ServiceInfo, ttl int) error {
+func (s *etcdRegisty) Register(etcdCfg etcdClientV3.Config, rpcSvc *ServiceInfo) error {
 	if rpcSvc == nil {
 		return fmt.Errorf(" Register失败. rpcSvc is nill.")
-	}
-	if ttl <= 0 {
-		ttl = _defaultTTL
 	}
 
 	var err error
@@ -81,7 +81,14 @@ func (s *etcdRegisty) Register(etcdCfg etcdClientV3.Config, rpcSvc *ServiceInfo,
 		return fmt.Errorf(" ETCD客户端连接失败. err:%s", err)
 	}
 
-	grpcproxy.Register(s.EtcdClient, rpcSvc.GrpcProxyEndpoint, rpcSvc.Addr, ttl)
+	grpcResolver := &etcdNaming.GRPCResolver{Client: s.EtcdClient}
+	err = grpcResolver.Update(context.TODO(), rpcSvc.GrpcProxyEndpoint, naming.Update{Op: naming.Add, Addr: rpcSvc.Addr})
+	if err != nil {
+		return fmt.Errorf(" Resolver 更新失败. err:%s", err)
+	}
+
+	// "github.com/coreos/etcd/proxy/grpcproxy"
+	// grpcproxy.Register(s.EtcdClient, rpcSvc.GrpcProxyEndpoint, rpcSvc.Addr, ttl)
 	return nil
 }
 

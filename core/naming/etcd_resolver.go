@@ -29,8 +29,9 @@ import (
 )
 
 const (
-	_WriteBufferSize       int   = 256 * 1024
-	_ReadBufferSize        int   = 256 * 1024
+	//google.golang.org/grpc/server.go.defaultServerOptions
+	_WriteBufferSize       int   = 256 * 1024 //32kb
+	_ReadBufferSize        int   = 256 * 1024 //32kb
 	_InitialWindowSize     int32 = 1 << 30
 	_InitialConnWindowSize int32 = 1 << 30
 )

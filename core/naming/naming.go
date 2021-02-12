@@ -34,7 +34,6 @@ type Naming struct {
 	config         etcdClientV3.Config
 	prefix         string
 	requestTimeout time.Duration
-	registerTtl    int
 
 	kvRegister sync.Map
 	kvResolver sync.Map
@@ -56,7 +55,7 @@ func (n *Naming) Register(serviceName, addr string) error {
 	s := &etcdRegisty{}
 	s.ServiceInfo = &ServiceInfo{Name: serviceName, Addr: addr,
 		GrpcProxyEndpoint: n.GetGrpcProxyEndpoint(serviceName)}
-	err = s.Register(n.config, s.ServiceInfo, n.registerTtl)
+	err = s.Register(n.config, s.ServiceInfo)
 	if err != nil {
 		return err
 	}

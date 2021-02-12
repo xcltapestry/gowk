@@ -45,7 +45,6 @@ func TestRun(t *testing.T) {
 	logger.Infow("Serve --> end.")
 
 	// defer Flush()
-
 }
 
 //RegisterHandlers 路由

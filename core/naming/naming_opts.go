@@ -28,7 +28,6 @@ func NewNaming(options ...func(*Naming)) *Naming {
 	cli := &Naming{}
 	cli.config.Endpoints = []string{_DefaultEndpoints}
 	cli.config.DialTimeout = 2 * time.Second
-	cli.registerTtl = 5
 	cli.prefix = _DefaultEtcdPrefix
 
 	for _, f := range options {
@@ -47,11 +46,5 @@ func WithAddress(addrs []string) NamingOption {
 func WithDialTimeout(dialTimeout time.Duration) NamingOption {
 	return func(c *Naming) {
 		c.config.DialTimeout = dialTimeout
-	}
-}
-
-func WithTTL(ttl int) NamingOption {
-	return func(c *Naming) {
-		c.registerTtl = ttl
 	}
 }
