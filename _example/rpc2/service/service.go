@@ -35,14 +35,21 @@ func main() {
 	logger.NewDefaultLogger()
 	app.New()
 
+	fmt.Println(" ------------------------------------- ")
+	keys := app.Confd().AllKeys()
+	for _, k := range keys {
+		fmt.Printf("AllKeys----[keys] %s\n", k)
+	}
+
 	httpSvc := services.NewHTTPService()
 	httpSvc.Router(RegisterHandlers)
-	httpSvc.SetHTTPAddr(":8003")
+	httpSvc.Listen(":8003")
 	app.Serve(httpSvc)
 
 	rpcSvc := services.NewRPCService()
 	// 启动监听,初始化
-	gRPCServer,err := rpcSvc.Initialize()
+	// gRPCServer,err := rpcSvc.Listen(":8082")
+	gRPCServer,err := rpcSvc.Listen()
 	if err != nil {
 		logger.Infow("Serve --> err:",err )
 		return 

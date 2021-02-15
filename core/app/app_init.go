@@ -17,9 +17,6 @@ package app
  *
  */
 
-// type ServiceDiscovery struct {
-// }
-
 import (
 	"flag"
 
@@ -43,7 +40,7 @@ func (app *Application) parseFlags() (*confd.AppConfig, error) {
 		namespace             string
 		appName               string
 		version               string
-		logsvcNats            string
+		//logsvcNats            string
 		confdLocalFile        string
 		confdRemoteAddrs      string
 		confdRemoteConfigType string
@@ -59,13 +56,13 @@ func (app *Application) parseFlags() (*confd.AppConfig, error) {
 	flag.StringVar(&namespace, "namespace", "default", "")
 	flag.StringVar(&appName, "app.name", "default", "")
 	flag.StringVar(&version, "app.version", "01", "")
-	flag.StringVar(&logsvcNats, "logsvc.nats", ";;nats://127.0.0.1:7222", "日志上报: nats标准配置,用;分隔")
+//	flag.StringVar(&logsvcNats, "logsvc.nats", ";;nats://127.0.0.1:7222", "日志上报: nats标准配置,用;分隔")
 
 	flag.Parse()
 
 	scfg := confd.NewAppConfig()
 	err := scfg.GetAppFlags(deployEnv, namespace, appName, version,
-		confdLocalFile, confdRemoteAddrs, confdRemoteConfigType, confdSyncMode, logsvcNats)
+		confdLocalFile, confdRemoteAddrs, confdRemoteConfigType, confdSyncMode) //, logsvcNats)
 	if err != nil {
 		return nil, err
 	}

@@ -93,9 +93,7 @@ func (app *Application) Run() error {
 		}()
 
 	}
-
 	// app.stop()
-
 	return nil
 }
 

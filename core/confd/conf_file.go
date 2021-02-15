@@ -26,7 +26,7 @@ func (cf *ConfLocalFile) LoadConfigFromLocalFile(loadViper *viper.Viper, confFil
 
 	path, ext, err := PaseConfigFile(confFile)
 	if err != nil {
-		return err
+		return fmt.Errorf(" err:%s confFile:%s",err,confFile)
 	}
 	if path != "" {
 		loadViper.AddConfigPath(path)
@@ -39,7 +39,7 @@ func (cf *ConfLocalFile) LoadConfigFromLocalFile(loadViper *viper.Viper, confFil
 	//读取配置
 	err = loadViper.ReadInConfig()
 	if err != nil {
-		return fmt.Errorf(" viper 读取本地配置文件失败. err:%s", err.Error())
+		return fmt.Errorf(" viper 读取本地配置文件失败. err:%s path:%s", err.Error(),path2)
 	}
 
 	return nil
@@ -71,9 +71,9 @@ func (cf *ConfLocalFile) getConfigType(configType string) string {
 
 //PaseConfigFile 解析文件，得到path,ext
 func PaseConfigFile(confFile string) (string, string, error) {
-	if _, err := os.Stat(confFile); os.IsNotExist(err) {
-		return "", "", err
-	}
+	// if _, err := os.Stat(confFile); os.IsNotExist(err) {
+	// 	return "", "", err
+	// }
 	path, fileName := filepath.Split(confFile)
 	ext := strings.ToLower(filepath.Ext(fileName))
 	fext := SubString(ext, 1, len(ext))

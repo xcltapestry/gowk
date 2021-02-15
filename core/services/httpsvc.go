@@ -22,7 +22,7 @@ import (
 	"net"
 	"net/http"
 	"time"
-
+	"strings"
 	"context"
 
 	muxCtx "github.com/gorilla/context"
@@ -68,6 +68,18 @@ func (s *HTTPService) SetHTTPAddr(addr string) {
 	s.Addr = addr
 }
 
+func (s *HTTPService) Listen(addrs... string) {
+	var addr string
+	for _, a := range addrs {
+		addr = a
+	}
+
+	if strings.TrimSpace(addr) != "" {
+		s.Addr = addr
+	}
+}
+
+
 func (s *HTTPService) SetHTTPTimeout(
 	connectTimeout, writeTimeout, readTimeout time.Duration) {
 	s.ConnectTimeout, s.WriteTimeout, s.ReadTimeout = connectTimeout, writeTimeout, readTimeout
@@ -97,7 +109,7 @@ func (s *HTTPService) mux() *mux.Router {
 
 func (s *HTTPService) init() error {
 	if s.route == nil {
-		return fmt.Errorf("%s", "route is nill!")
+		return fmt.Errorf("%s", "route is null!")
 	}
 
 	http.Handle("/", s.route)

@@ -38,7 +38,7 @@ type AppConfig struct {
 	namespace  string
 	appName    string
 	appVersion string
-	logsvcNats string // 日志上报服务器地址
+	// logsvcNats string // 日志上报服务器地址
 
 	// --- flag - confd
 	// confd.remote.addrs与localConfigFile 必填一个，否则启动失败
@@ -128,14 +128,14 @@ func (c *AppConfig) verify() error {
 
 //GetAppFlags 从命令行参数与环境变量中获取参数
 func (c *AppConfig) GetAppFlags(deployEnv, namespace, appName, appVersion string,
-	confdLocalFile, confdRemoteAddrs, confdRemoteConfigType string, confdSyncMode bool,
-	logsvcNats string) error {
+	confdLocalFile, confdRemoteAddrs, confdRemoteConfigType string, confdSyncMode bool) error {
+	// logsvcNats string) error {
 
 	c.deployEnv, c.namespace, c.appName, c.appVersion = deployEnv, namespace, appName, appVersion
 	c.localConfigFile, c.confdRemoteAddrs = confdLocalFile, confdRemoteAddrs
 	c.confdRemoteConfigType = confdRemoteConfigType
 	c.confdSyncMode = confdSyncMode
-	c.logsvcNats = logsvcNats
+	// c.logsvcNats = logsvcNats
 
 	if err := c.verify(); err != nil {
 		return err
@@ -211,8 +211,8 @@ func (c *AppConfig) String() string {
 	builder.WriteString(c.appName)
 	builder.WriteString(" \nappVersion=")
 	builder.WriteString(c.appVersion)
-	builder.WriteString(" \nlogsvcNats=")
-	builder.WriteString(c.logsvcNats)
+	// builder.WriteString(" \nlogsvcNats=")
+	// builder.WriteString(c.logsvcNats)
 	builder.WriteString(" \nlocalConfigFile=")
 	builder.WriteString(c.localConfigFile)
 	builder.WriteString(" \nconfdRemoteAddrs=")

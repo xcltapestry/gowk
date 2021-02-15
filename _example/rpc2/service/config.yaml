@@ -1,0 +1,17 @@
+ApiVersion: 0.0.1
+Env: dev
+Namespace: xxx.cluster
+discovery:
+ server:
+    http: 8088
+    grpc: 9099
+ registry:
+    etcdv3:
+      endpoints: ["127.0.0.1:2379"]
+      connectTimeout: 10
+Service:
+  Name: ordersvc
+  Redis:
+    Addr: 127.0.0.1
+    Port: :6377
+  
