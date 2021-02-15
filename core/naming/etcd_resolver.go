@@ -26,6 +26,7 @@ import (
 	etcdClientV3 "github.com/coreos/etcd/clientv3"
 	etcdNaming "github.com/coreos/etcd/clientv3/naming"
 	"google.golang.org/grpc"
+	//_ "google.golang.org/grpc/encoding/gzip"
 )
 
 const (
@@ -63,6 +64,7 @@ func (r *etcdResolver) GetResolver(etcdCfg etcdClientV3.Config, rpcSvc *ServiceI
 		grpc.WithTimeout(time.Second*10),
 		grpc.WithBlock(),
 		grpc.WithDefaultCallOptions(
+			//grpc.UseCompressor(gzip.Name), //zip
 			grpc.FailFast(false),
 			grpc.MaxCallRecvMsgSize(math.MaxInt32),
 			grpc.MaxCallSendMsgSize(math.MaxInt32)),
