@@ -48,3 +48,9 @@ func WithDialTimeout(dialTimeout time.Duration) NamingOption {
 		c.config.DialTimeout = dialTimeout
 	}
 }
+
+func WithPrefix(prefix string) NamingOption {
+	return func(c *Naming) {
+		c.prefix = prefix
+	}
+}

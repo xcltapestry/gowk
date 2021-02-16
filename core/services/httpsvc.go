@@ -60,7 +60,7 @@ func NewHTTPService() *HTTPService {
 func (s *HTTPService) Initialize() error {
 	s.ConnectTimeout, s.WriteTimeout, s.ReadTimeout = 60*time.Second, 60*time.Second, 60*time.Second
 	s.MaxHeaderBytes = 1 << 20
-	s.Addr = ":8000"
+	s.Addr = ":8088"
 	return nil
 }
 

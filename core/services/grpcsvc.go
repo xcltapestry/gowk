@@ -28,35 +28,20 @@ import (
 	"github.com/xcltapestry/gowk/pkg/logger"
 )
 
-var _serviceName = "_serviceName"
-
 type RPCService struct {
-	rpcSvcAddr string
-
-	port       string
+	gRPCPort       string
 	listen     net.Listener
 	grpcServer *grpc.Server
-
 	discovery *naming.Naming
+	rpcServices map[string]interface{} 
 }
 
 func NewRPCService() *RPCService {
 	svc := &RPCService{}
-	svc.port = ":8082"
+	svc.gRPCPort = ":9099"
+	svc.rpcServices = make(map[string]interface{})
 	return svc
 }
-
-
-// func (s *RPCService) Initialize() (*grpc.Server,error) {
-// 	var err error
-// 	s.listen, err = net.Listen("tcp", s.port)
-// 	if err != nil {
-// 		return nil,fmt.Errorf("failed start server::%s", err)
-// 	}
-// 	s.grpcServer = grpc.NewServer()
-
-// 	return s.grpcServer,nil
-// }
 
 func (s *RPCService) Listen(addrs... string) (*grpc.Server,error) {
 
@@ -66,52 +51,61 @@ func (s *RPCService) Listen(addrs... string) (*grpc.Server,error) {
 	}
 
 	if strings.TrimSpace(addr) != "" {
-		s.port = addr
+		s.gRPCPort = addr
 	}
 
 	var err error
-	s.listen, err = net.Listen("tcp", s.port)
+	s.listen, err = net.Listen("tcp", s.gRPCPort)
 	if err != nil {
-		return nil,fmt.Errorf("failed start server:%s port:%s", err,s.port)
+		return nil,fmt.Errorf("failed start server:%s port:%s", err,s.gRPCPort)
 	}
 	s.grpcServer = grpc.NewServer()
 
 	return s.grpcServer,nil
 }
 
-func (s *RPCService) Run() error {
-	logger.Info("gRPC服务开始启动...")
-	go func() {
-		logger.Info("gRPC服务准备监控端口...")
-		if err := s.grpcServer.Serve(s.listen); err != nil {
-			logger.Fatal("failed serve:",err)
-		}
-		fmt.Printf("gRPC服务停止监听端口: %s\n", s.port)
-	}()
-
-	return s.registerService()
+func (s *RPCService) NewNaming(options ...func(*naming.Naming)) error {
+	s.discovery = naming.NewNaming(options...)
+	return nil 
 }
 
-
-func (s *RPCService) registerService() error{
-	s.rpcSvcAddr = fmt.Sprintf("127.0.0.1%s", s.port)
-	// fmt.Println("开始注册服务  服务名:", _serviceName, " 端口:", rpcSvcAddr)
+func (s *RPCService) Registry(rpcName string)error{
+	if s.discovery  == nil {
+		return fmt.Errorf(" 需先执行NewNaming()，再执行Registry().")
+	}
 	var err error
-	s.discovery = naming.NewNaming(naming.WithAddress([]string{"localhost:2379"}))
-	err = s.discovery.Register(_serviceName, s.rpcSvcAddr)
+	err = s.discovery.Register(rpcName, s.gRPCPort)
 	if err != nil {
 		return fmt.Errorf("Register err: %s", err.Error())
 	}
-	logger.Info("gRPC服务注册成功!")
+	s.rpcServices[rpcName] = "" 
+	logger.Info("RPC服务(",rpcName,")注册成功!")
+	return nil 
+}
+
+
+func (s *RPCService) Run() error {
+	logger.Info("RPC服务开始启动...")
+	go func() {
+		logger.Info("RPC服务准备监控端口...")
+		if err := s.grpcServer.Serve(s.listen); err != nil {
+			logger.Panic("failed serve:",err)
+		}
+		logger.Infof("RPC服务停止监听端口: %s\n", s.gRPCPort)
+	}()
 	return nil 
 }
 
 func (s *RPCService) Stop(ctx context.Context) {
 	if s.discovery != nil {
-		err := s.discovery.Deregister(_serviceName, s.rpcSvcAddr)
-		if err != nil {
-			logger.Info(" Deregister err:", err," _serviceName",_serviceName)
-		}
+		for k,_ := range  s.rpcServices {
+			err := s.discovery.Deregister(k, s.gRPCPort)
+			if err != nil {
+				logger.Error(" Deregister err:", err," service:",k)
+			}else{
+				logger.Info(" Deregister service:",k)
+			}
+		}  
 	}
 
 	if s.grpcServer != nil {
@@ -126,4 +120,9 @@ func (s *RPCService) Stop(ctx context.Context) {
 func (s *RPCService) GetgRPCServer() *grpc.Server {
 	return s.grpcServer
 }
+
+
+
+
+
 

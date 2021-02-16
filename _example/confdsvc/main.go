@@ -28,16 +28,13 @@ test:
 
 */
 func main() {
-	// logger.NewDefaultLogger()
 	logger.NewLogger(logger.Text)
 	app.New()
 	httpsvc := services.NewHTTPService()
 	httpsvc.Router(RegisterHandlers)
-	httpsvc.SetHTTPAddr(":8003")
+	httpsvc.Listen()
 	app.Serve(httpsvc)
-	logger.Infow("Serve -->Listen :8003")
 	app.Run()
-	logger.Infow("Serve --> end.")
 }
 
 //RegisterHandlers 路由
